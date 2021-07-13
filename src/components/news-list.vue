@@ -8,7 +8,7 @@
 
       <article class="article" v-for="item of data" :key="item.url">
         <div class="article-wrap">
-          <div>{{ `${item.author}, ${item.publishedAt}` }}  </div>
+          <div>{{ `${item.author}, ${dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm:ss')}` }}  </div>
           <h3>{{ item.title }}</h3>
           <p class="description">{{ item.description }}</p>
         </div>
@@ -20,8 +20,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, PropType } from 'vue'
+import { defineComponent, computed, PropType } from 'vue'
 import { NPagination, NDropdown, NButton } from 'naive-ui'
+import dayjs from 'dayjs'
 
 export default defineComponent({
   name: 'news-list',
@@ -61,6 +62,7 @@ export default defineComponent({
     }
 
     return {
+      dayjs,
       count,
       handleSort,
     }
@@ -97,7 +99,8 @@ export default defineComponent({
 
 .img {
   margin-left: 24px;
-  width: 200px;
+  width: 30%;
+  max-width: 200px;
   height: auto;
   vertical-align: middle;
 }

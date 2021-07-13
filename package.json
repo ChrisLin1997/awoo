@@ -6,6 +6,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "dayjs": "^1.10.6",
     "naive-ui": "^2.15.4",
     "vue": "^3.0.5",
     "vue-router": "4"

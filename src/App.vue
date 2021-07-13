@@ -1,7 +1,18 @@
 <template>
-  <header>
-    <n-input v-model:value="searchText" type="text" />
-    <n-button @click="handleSearch">搜尋</n-button>
+  <header class="header">
+    <n-input 
+      v-model:value="searchText"
+      @keyup.enter="handleSearch"
+      type="text"
+    />
+    <n-date-picker
+      v-model:value="dateRange"
+      type="datetimerange"
+      format="yyyy-MM-dd HH:mm:ss"
+      :is-date-disabled="disablePreviousDate"
+      clearable
+    />
+    <n-button @click="handleSearch" type="primary">搜尋</n-button>
   </header>
 
   <main>
@@ -19,11 +30,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue'
+import { computed, defineComponent, ref, watch, watchEffect } from 'vue'
 import NewsList from '@/components/news-list.vue'
 import NewsDetail from '@/components/news-detail.vue'
 import { getNewsListService } from '@/api'
-import { NInput, NButton } from 'naive-ui'
+import { NInput, NButton, NDatePicker } from 'naive-ui'
+import dayjs from 'dayjs'
 
 enum Type { list, detail }
 
@@ -35,12 +47,12 @@ export default defineComponent({
     NewsDetail,
     NInput,
     NButton,
+    NDatePicker,
   },
 
   setup () {
     const type = ref(Type.list)
     const isList = computed(() => type.value === Type.list)
-
     
     const sortOptions = [
       { label: '相關度', key: 'relevancy' },
@@ -57,15 +69,13 @@ export default defineComponent({
     const searchText = ref('COVID-19')
     const newsList = ref<Article[]>([])
     const page = ref(1)
-
-    const dateRange = ref([])
-
     watch(page, () => getNewsList())
 
-    const handleSearch = () => {
-      page.value = 1
-      getNewsList()
+    const dateRange = ref<[number, number] | null>(null)
+    const disablePreviousDate = (ts) => {
+        return ts > Date.now()
     }
+
     const getNewsList = async () => {
       if (searchText.value === '') return 
 
@@ -73,12 +83,16 @@ export default defineComponent({
         q: searchText.value,
         page: page.value,
       }
-      // if (from) submitForm.from = from
-      // if (to) submitForm.to = to
+      if (dateRange.value) submitForm.from = dayjs(dateRange.value[0]).format('YYYY-MM-DDTHH:mm:ss')
+      if (dateRange.value) submitForm.to = dayjs(dateRange.value[1]).format('YYYY-MM-DDTHH:mm:ss')
       if (sort.value) submitForm.sortBy = sort.value
-      // if (page) submitForm.page = page
       const result = await getNewsListService(submitForm)
       newsList.value = result.articles
+    }
+
+    const handleSearch = () => {
+      page.value = 1
+      getNewsList()
     }
 
     getNewsList()
@@ -88,11 +102,15 @@ export default defineComponent({
       type,
       isList,
 
+      searchText,
+
       sort,
       sortOptions,
       updateSort,
 
-      searchText,
+      dateRange,
+      disablePreviousDate,
+
       newsList,
       handleSearch,
       getNewsList,
@@ -111,5 +129,11 @@ export default defineComponent({
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+</style>
+
+<style scoped>
+.header {
+  
 }
 </style>
