@@ -1,19 +1,28 @@
 <template>
   <header>
-    <span>search bar</span>
-    <input type="text">
+    <n-input v-bind="$attrs" type="text" />
+    <n-button @click="handleSearch">搜尋</n-button>
   </header>
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
+import { NInput, NButton } from 'naive-ui'
 
 export default defineComponent({
   name: 'search-bar',
 
-  setup () {
-    const count = ref(0)
-    return { count }
+  components: {
+    NInput,
+    NButton,
+  },
+
+  setup (props, context) {
+    const handleSearch = () => { context.emit('search') }
+
+    return {
+      handleSearch,
+    }
   }
 })
 </script>
