@@ -1,18 +1,24 @@
 <template>
   <header class="header">
-    <n-input 
-      v-model:value="searchText"
-      @keyup.enter="handleSearch"
-      type="text"
-    />
-    <n-date-picker
-      v-model:value="dateRange"
-      type="datetimerange"
-      format="yyyy-MM-dd HH:mm:ss"
-      :is-date-disabled="disablePreviousDate"
-      clearable
-    />
-    <n-button @click="handleSearch" type="primary">搜尋</n-button>
+    <h1>NEWS API SEARCH</h1>
+
+    <div class="search-wrap">
+      <n-input
+        class="input"
+        v-model:value="searchText"
+        @keyup.enter="handleSearch"
+        type="text"
+      />
+      <n-date-picker
+        class="date-picker"
+        v-model:value="dateRange"
+        type="datetimerange"
+        format="yyyy-MM-dd HH:mm:ss"
+        :is-date-disabled="disablePreviousDate"
+        clearable
+      />
+      <n-button @click="handleSearch" type="primary">搜尋</n-button>
+    </div>
   </header>
 
   <main>
@@ -72,7 +78,7 @@ export default defineComponent({
     watch(page, () => getNewsList())
 
     const dateRange = ref<[number, number] | null>(null)
-    const disablePreviousDate = (ts) => {
+    const disablePreviousDate = (ts: number) => {
         return ts > Date.now()
     }
 
@@ -121,19 +127,28 @@ export default defineComponent({
 })
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
-
 <style scoped>
 .header {
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 300px;
+  background-color: rgba(0, 128, 0, 0.24);
+}
+
+.search-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input {
+  margin-right: 12px;
+  width: 360px;
+}
+
+.date-picker {
+  margin-right: 12px;
+  width: 200px;
 }
 </style>

@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 import ArrowBack from '@/assets/ArrowBackUp.svg'
 import { NButton } from 'naive-ui'
 

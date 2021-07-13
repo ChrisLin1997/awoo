@@ -83,6 +83,7 @@ export default defineComponent({
   display: flex;
   text-align: left;
   cursor: pointer;
+  transition: all .2s;
 }
 
 .article:not(:last-child) {
@@ -90,7 +91,7 @@ export default defineComponent({
 }
 
 .article:hover {
-  background-color:aliceblue;
+  background-color: rgba(0, 128, 0, 0.12);
 }
 
 .article-wrap {
