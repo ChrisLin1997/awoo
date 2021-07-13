@@ -28,22 +28,24 @@
       :data="newsList"
       :total="total"
       :sort="sort"
-      :sortOptions="sortOptions"
       @updateSort="updateSort"
+      @updateDetail="updateDetail"
     />
-    <news-detail v-show="!isList" />
+    <news-detail
+      v-show="!isList"
+      :detail="detail"
+      @updateDetail="updateDetail"
+    />
   </main>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch, watchEffect } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import NewsList from '@/components/news-list.vue'
 import NewsDetail from '@/components/news-detail.vue'
 import { getNewsListService } from '@/api'
 import { NInput, NButton, NDatePicker } from 'naive-ui'
 import dayjs from 'dayjs'
-
-enum Type { list, detail }
 
 export default defineComponent({
   name: 'App',
@@ -57,14 +59,12 @@ export default defineComponent({
   },
 
   setup () {
-    const type = ref(Type.list)
-    const isList = computed(() => type.value === Type.list)
+    const detail = ref<Article | null>(null)
+    const updateDetail = (value: Article | null) => {
+      detail.value = value
+    }
+    const isList = computed(() => detail.value === null)
     
-    const sortOptions = [
-      { label: '相關度', key: 'relevancy' },
-      { label: '人氣', key: 'popularity' },
-      { label: '發布時間', key: 'publishedAt' },
-    ]
     const sort = ref('')
     const updateSort = (key: string) => {
       sort.value = key
@@ -98,20 +98,20 @@ export default defineComponent({
 
     const handleSearch = () => {
       page.value = 1
+      detail.value = null
       getNewsList()
     }
 
-    getNewsList()
-    
+    getNewsList()    
 
     return {
-      type,
+      detail,
+      updateDetail,
       isList,
 
       searchText,
 
       sort,
-      sortOptions,
       updateSort,
 
       dateRange,

@@ -1,14 +1,14 @@
 <template>
     <section class="wrapper">
       <div class="sort">
-        <n-dropdown :options="sortOptions" @select="handleSort" trigger="click">
+        <n-dropdown :options="sortOptions" @select="updateSort" trigger="click">
           <n-button>{{ sortOptions.find(item => item.key === sort)?.label || '排序' }}</n-button>
         </n-dropdown>
       </div>
 
-      <article class="article" v-for="item of data" :key="item.url">
+      <article class="article" v-for="item of data" :key="item.url" @click="updateDetail(item)">
         <div class="article-wrap">
-          <div>{{ `${item.author}, ${dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm:ss')}` }}  </div>
+          <div>{{ `${item.author}, ${dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm:ss')}` }}</div>
           <h3>{{ item.title }}</h3>
           <p class="description">{{ item.description }}</p>
         </div>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from 'vue'
+import { defineComponent, computed, PropType, readonly } from 'vue'
 import { NPagination, NDropdown, NButton } from 'naive-ui'
 import dayjs from 'dayjs'
 
@@ -46,25 +46,33 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    sortOptions: {
-      type: Array,
-      required: true,
-    }
   },
 
-  emits: ['updateSort'],
+  emits: ['updateSort', 'updateDetail'],
 
   setup (props, context) {
+    const sortOptions = readonly([
+      { label: '相關度', key: 'relevancy' },
+      { label: '人氣', key: 'popularity' },
+      { label: '發布時間', key: 'publishedAt' },
+    ])
+
     const count = computed(() => Math.ceil(props.total / 20))
 
-    const handleSort = (key: string) => {
+    const updateSort = (key: string) => {
       context.emit('updateSort', key)
+    }
+
+    const updateDetail = (item:Article) => {
+      context.emit('updateDetail', item)
     }
 
     return {
       dayjs,
+      sortOptions,
       count,
-      handleSort,
+      updateSort,
+      updateDetail,
     }
   }
 })
