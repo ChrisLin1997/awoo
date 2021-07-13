@@ -1,23 +1,22 @@
 <template>
   <div>
-    <span>news-detail</span>
-    <img :src="ArrowBack" />
-    <span>返回</span>
+    <n-button @click="() => {}">
+      <img class="back" :src="ArrowBack" />
+    </n-button>
   </div>
 </template>
 
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
 import ArrowBack from '@/assets/ArrowBackUp.svg'
+import { NButton } from 'naive-ui'
 
 export default defineComponent({
   name: 'news-detail',
-  // props: {
-  //   id: {
-  //     type: String,
-  //     required: true
-  //   }
-  // },
+
+  components: {
+    NButton,
+  },
 
   setup () {
     return { 
@@ -26,3 +25,9 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+.back {
+  width: 36px;
+}
+</style>
