@@ -1,22 +1,22 @@
 <template>
-    <section class="wrapper">
-      <div class="sort">
-        <n-dropdown :options="sortOptions" @select="updateSort" trigger="click">
-          <n-button>{{ sortOptions.find(item => item.key === sort)?.label || '排序' }}</n-button>
-        </n-dropdown>
+  <section class="wrapper">
+    <div class="sort">
+      <n-dropdown :options="sortOptions" @select="updateSort" trigger="click">
+        <n-button>{{ sortOptions.find(item => item.key === sort)?.label || '排序' }}</n-button>
+      </n-dropdown>
+    </div>
+
+    <article class="article" v-for="item of data" :key="item.url" @click="updateDetail(item)">
+      <div class="article-wrap">
+        <div>{{ `${item.author}, ${dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm:ss')}` }}</div>
+        <h3 class="ellipsis">{{ item.title }}</h3>
+        <p class="ellipsis">{{ item.description }}</p>
       </div>
+      <img class="img" :src="item.urlToImage" />
+    </article>
 
-      <article class="article" v-for="item of data" :key="item.url" @click="updateDetail(item)">
-        <div class="article-wrap">
-          <div>{{ `${item.author}, ${dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm:ss')}` }}</div>
-          <h3>{{ item.title }}</h3>
-          <p class="description">{{ item.description }}</p>
-        </div>
-        <img class="img" :src="item.urlToImage" />
-      </article>
-
-      <n-pagination class="page" v-if="data.length" v-bind="$attrs" :page-count="count" />
-    </section>
+    <n-pagination class="page" v-if="data.length" v-bind="$attrs" :page-count="count" />
+  </section>
 </template>
 
 <script lang="ts">
@@ -87,8 +87,11 @@ export default defineComponent({
 }
 
 .article {
-  padding: 12px 16px;
+  padding: .8rem 1rem;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-height: 180px;
   text-align: left;
   cursor: pointer;
   transition: all .2s;
@@ -103,21 +106,23 @@ export default defineComponent({
 }
 
 .article-wrap {
-  flex: 1;
+  width: 70%;
 }
 
 .img {
   margin-left: 24px;
   width: 30%;
   max-width: 200px;
-  height: auto;
+  height: fit-content;
   vertical-align: middle;
+  background-size: contain;
 }
 
-.description {
+.ellipsis {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .page {
@@ -126,7 +131,7 @@ export default defineComponent({
 }
 
 .sort {
-  margin: 8px 16px;
+  margin: 16px;
   text-align: right;
 }
 

@@ -5,3 +5,8 @@
   text-align: center;
   color: #2c3e50;
 }
+
+.n-loading-bar {
+  background-color: #176264 !important;
+  height: 4px !important;
+}

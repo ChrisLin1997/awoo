@@ -11,6 +11,10 @@
       <div>{{ `${detail.author}, ${dayjs(detail.publishedAt).format('YYYY-MM-DD HH:mm:ss')}` }}</div>
       <img class="img" :src="detail.urlToImage">
       <p>{{ detail.content }}</p>
+      <div class="source">
+        <span>*source: </span>
+        <span class="source-name">{{ detail.source.name }}</span>
+      </div>
     </article>
   </div>
 </template>
@@ -52,8 +56,7 @@ export default defineComponent({
 
 <style scoped>
 .wrapper {
-  margin: 24px auto;
-  padding: 0 16px;
+  margin: 24px auto 48px;
   max-width: 1024px;
   width: 100%;
 }
@@ -67,7 +70,17 @@ export default defineComponent({
 }
 
 .img {
-  margin: 12px 0;
-  width: 100%;
+  margin: 24px 0;
+  width: 80%;
+}
+
+.source {
+  text-align: right;
+  font-size: 18px;
+}
+
+.source-name {
+  font-weight: bold;
+  border-bottom: 1px solid;
 }
 </style>
