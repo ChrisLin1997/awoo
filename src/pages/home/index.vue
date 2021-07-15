@@ -5,13 +5,13 @@
     <div class="search-wrap">
       <n-input
         class="input"
-        v-model:value="searchText"
+        v-model:value="searchForm.q"
         @keyup.enter="handleSearch"
         type="text"
       />
       <n-date-picker
         class="date-picker"
-        v-model:value="dateRange"
+        v-model:value="searchForm.dateRange"
         type="datetimerange"
         format="yyyy-MM-dd HH:mm:ss"
         :is-date-disabled="disablePreviousDate"
@@ -24,10 +24,10 @@
   <main class="main">
     <news-list
       v-show="isList"
-      v-model:page="page"
+      v-model:page="searchForm.page"
       :data="newsList"
       :total="total"
-      :sort="sort"
+      :sort="searchForm.sort"
       @updateSort="updateSort"
       @updateDetail="updateDetail"
     />
@@ -40,12 +40,22 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue'
+import { computed, defineComponent, reactive, ref, watch, toRaw } from 'vue'
 import NewsList from './news-list.vue'
 import NewsDetail from './news-detail.vue'
 import { getNewsListService } from '@/api'
 import { NInput, NButton, NDatePicker, useLoadingBar, NLoadingBarProvider } from 'naive-ui'
 import dayjs from 'dayjs'
+
+const defaultForm: NewsForm = sessionStorage.getItem('form') ? 
+  JSON.parse(sessionStorage.getItem('form') as string) : {
+  q: 'COVID-19',
+  dateRange: null,
+  sort: 'relevancy',
+  page: 1,
+}
+
+const total = 100
 
 export default defineComponent({
   name: 'home',
@@ -60,75 +70,70 @@ export default defineComponent({
   },
 
   setup () {
+    // detail
     const detail = ref<Article | null>(null)
     const updateDetail = (value: Article | null) => {
       detail.value = value
     }
     const isList = computed(() => detail.value === null)
-    
-    const sort = ref('')
+
+    // form
+    const searchForm = reactive(defaultForm)
     const updateSort = (key: string) => {
-      sort.value = key
+      searchForm.sort = key
       getNewsList()
     }
 
-    const total = 100
-    const searchText = ref('COVID-19')
-    const newsList = ref<Article[]>([])
-    const page = ref(1)
-    watch(page, () => getNewsList())
+    watch(() => searchForm.page, () => getNewsList())
 
-    const dateRange = ref<[number, number] | null>(null)
-    const disablePreviousDate = (ts: number) => {
-        return ts > Date.now()
+    const saveForm = (form: NewsForm) => {
+      sessionStorage.setItem('form', JSON.stringify(toRaw(form)))
     }
 
+    // list
+    const newsList = ref<Article[]>([])
     const loadingBar = useLoadingBar()
-
     const getNewsList = async () => {
-      if (searchText.value === '') return 
+      if (searchForm.q === '') return 
 
       loadingBar?.start()
 
-      const submitForm: NewsForm = {
-        q: searchText.value,
-        page: page.value,
-      }
-      if (dateRange.value) submitForm.from = dayjs(dateRange.value[0]).format('YYYY-MM-DDTHH:mm:ss')
-      if (dateRange.value) submitForm.to = dayjs(dateRange.value[1]).format('YYYY-MM-DDTHH:mm:ss')
-      if (sort.value) submitForm.sortBy = sort.value
+      const submitForm: NewsSubmitForm = { q: searchForm.q, page: searchForm.page }
+      if (searchForm.dateRange) submitForm.from = dayjs(searchForm.dateRange[0]).format('YYYY-MM-DDTHH:mm:ss')
+      if (searchForm.dateRange) submitForm.to = dayjs(searchForm.dateRange[1]).format('YYYY-MM-DDTHH:mm:ss')
+      if (searchForm.sort) submitForm.sortBy = searchForm.sort
       const result = await getNewsListService(submitForm)
       newsList.value = result.articles
+      saveForm(searchForm)
 
       loadingBar?.finish()
     }
 
     const handleSearch = () => {
-      page.value = 1
+      searchForm.page = 1
       detail.value = null
       getNewsList()
     }
 
-    getNewsList()    
+    getNewsList()
+
+    const disablePreviousDate = (ts: number) => ts > Date.now()
 
     return {
+      total,
+
       detail,
       updateDetail,
       isList,
 
-      searchText,
-
-      sort,
+      searchForm,
       updateSort,
-
-      dateRange,
-      disablePreviousDate,
 
       newsList,
       handleSearch,
       getNewsList,
-      total,
-      page,
+
+      disablePreviousDate,
     }
   }
 })

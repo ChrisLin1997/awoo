@@ -26,10 +26,17 @@ interface Article {
 
 interface NewsForm {
   q: string;
+  dateRange: null | [Date, Date];
+  sort: string;
+  page: number;
+}
+
+interface NewsSubmitForm {
+  q: string;
   from?: string;
   to?: string;
   sortBy?: string;
-  page?: number;
+  page: number;
 }
 
 
